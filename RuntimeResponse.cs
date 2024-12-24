@@ -1,0 +1,1 @@
+public record RuntimeResponse(string result, string runtime, string memo);

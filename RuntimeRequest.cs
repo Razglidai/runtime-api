@@ -1,0 +1,1 @@
+public record RuntimeRequest(string code, ICollection<string> input);
