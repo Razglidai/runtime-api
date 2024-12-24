@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("runtime-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+080d246c288ef1dd4ee108a598db0f60f7c4eb42")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dd05ce9ead52ca1fd7090e7f5b2c5d65dfc80fde")]
 [assembly: System.Reflection.AssemblyProductAttribute("runtime-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("runtime-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
