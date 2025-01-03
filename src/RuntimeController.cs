@@ -4,17 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 public class RuntimeController : ControllerBase
 {
-    private ExecuterStorage _executerStorage;
+    private ExecutorStorage _ExecutorStorage;
 
-    public RuntimeController(ExecuterStorage executerStorage)
+    public RuntimeController(ExecutorStorage ExecutorStorage)
     {
-        _executerStorage = executerStorage;
+        _ExecutorStorage = ExecutorStorage;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetRuntimeList()
     {
-        return Ok(_executerStorage.GetExecutersList());
+        return Ok(_ExecutorStorage.GetExecutorsList());
     }
     [Route("{type}")]
     [HttpPost]
@@ -23,7 +23,7 @@ public class RuntimeController : ControllerBase
         RuntimeResponse result;
         try
         {
-            result = _executerStorage.GetExecuter(type).Execute(request);
+            result = _ExecutorStorage.GetExecutor(type).Execute(request);
         }
         catch (System.Exception e)
         {

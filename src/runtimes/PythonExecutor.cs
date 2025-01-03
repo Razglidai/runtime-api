@@ -1,8 +1,8 @@
 using IronPython.Hosting;
 using Microsoft.Scripting.Hosting;
 
-[ExecutersAttribute("python")]
-public class PythonExecuter : IRuntimeExecuter
+[ExecutorsAttribute("python")]
+public class PythonExecutor : IRuntimeExecutor
 {
     private ScriptEngine _engine = Python.CreateEngine();
     public RuntimeResponse Execute(RuntimeRequest request)

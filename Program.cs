@@ -5,7 +5,7 @@ var services = builder.Services;
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 services.AddControllers();
-services.AddTransient<ExecuterStorage>();
+services.AddTransient<ExecutorStorage>();
 var app = builder.Build();
 
 

@@ -1,7 +1,7 @@
 [AttributeUsage(AttributeTargets.Class)]
-public class ExecutersAttribute : System.Attribute
+public class ExecutorsAttribute : System.Attribute
 {
-    public ExecutersAttribute(string type)
+    public ExecutorsAttribute(string type)
     {
         Type = type;
     }
