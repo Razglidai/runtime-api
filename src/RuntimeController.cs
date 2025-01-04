@@ -1,34 +1,35 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
 public class RuntimeController : ControllerBase
 {
-    private ExecuterStorage _executerStorage;
+    private ExecutorStorage _ExecutorStorage;
 
-    public RuntimeController(ExecuterStorage executerStorage)
+    public RuntimeController(ExecutorStorage ExecutorStorage)
     {
-        _executerStorage = executerStorage;
+        _ExecutorStorage = ExecutorStorage;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRuntimeList()
+    public Task<IActionResult> GetRuntimeList()
     {
-        return Ok(_executerStorage.GetExecutersList());
+        return Task.FromResult<IActionResult>(Ok(_ExecutorStorage.GetExecutorsList()));
     }
     [Route("{type}")]
     [HttpPost]
-    public async Task<IActionResult> ExecuteCode(string type, [FromBody]RuntimeRequest request)
+    public Task<IActionResult> ExecuteCode(string type, [FromBody]RuntimeRequest request)
     {
         RuntimeResponse result;
         try
         {
-            result = _executerStorage.GetExecuter(type).Execute(request);
+            result = _ExecutorStorage.GetExecutor(type).Execute(request);
         }
         catch (System.Exception e)
         {
-            return BadRequest(e);
+            return Task.FromResult<IActionResult>(BadRequest(e));
         }
-        return Ok(result);
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

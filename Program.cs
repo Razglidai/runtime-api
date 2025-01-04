@@ -1,26 +1,14 @@
-var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
-var services = builder.Services;
+using Microsoft.AspNetCore.Builder;
 
-services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
-services.AddControllers();
-services.AddTransient<ExecuterStorage>();
+var builder = WebApplication.CreateBuilder(args);
+
+// Конфигурируем сервисы
+Startup.ConfigureServices(builder.Services);
+
+// Собираем приложение
 var app = builder.Build();
 
-
-using var scope = app.Services.CreateScope();
-
-
-app.UseCors();
-app.MapControllers();
-
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Я забыл чё тут должно быть написано
+Startup.Configure(app, app.Environment);
 
 app.Run();
