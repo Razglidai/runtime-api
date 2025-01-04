@@ -13,6 +13,9 @@ public class Startup()
         services.AddSwaggerGen();
         services.AddControllers();
         services.AddTransient<ExecutorStorage>();
+
+        services.AddTransient<ILangService, CLangService>();
+        services.AddTransient<IRuntimeExecutor, ClangExecutor>();
     }
 
     public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
