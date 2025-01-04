@@ -20,7 +20,7 @@ public class ClangExecutor : IRuntimeExecutor
     private int CompileSourceCode(string code)
     {
         Random rand = new();
-        string filename = rand.Next(0, 128).ToString();
+        string filename = rand.Next(0, 1000000000).ToString();
         sourceFileName = filename + ".c";
         binaryFileName = filename + ".elf";
 
@@ -29,7 +29,7 @@ public class ClangExecutor : IRuntimeExecutor
 
         var compilerProcess = new ProcessStartInfo
         {
-            FileName = "/usr/bin/gcc",
+            FileName = RuntimeConstants.ClangCompilerPath,
             Arguments = $"{sourceFileName} -o {binaryFileName}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -53,7 +53,7 @@ public class ClangExecutor : IRuntimeExecutor
     {
         var executionProcess = new ProcessStartInfo
         {
-            FileName = $"/bin/sh", // Using /bin/sh to execute the binary
+            FileName = RuntimeConstants.ShellPath, // Using /bin/sh to execute the binary
             Arguments = $"-c ./{binaryFileName}", // Properly call the binary
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -92,17 +92,18 @@ public class ClangExecutor : IRuntimeExecutor
 
         if (compilationExitCode != 0)
         {
+            Cleanup();
             return new RuntimeResponse("clang", guid.ToString(), output);
         }
         
         int executionExitCode = ExecuteBinaryFile();
         output.Add(executionSTDOUT);
         output.Add(executionSTDERR);
+        Cleanup();
 
         return new RuntimeResponse("clang", guid.ToString(), output);
     }
 
     ~ClangExecutor() {
-        Cleanup();
     }
 }
