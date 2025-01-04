@@ -1,0 +1,15 @@
+[Unit]
+Description=runtime-api
+
+[Service]
+WorkingDirectory=/workspace
+ExecStart=/usr/bin/dotnet /workspace/YOUR_APP_DLL_NAME.dll
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=runtime-api
+User=root
+Environment=ASPNETCORE_ENVIRONMENT=Production
+
+[Install]
+WantedBy=multi-user.target
