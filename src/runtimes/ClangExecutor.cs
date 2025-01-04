@@ -19,8 +19,9 @@ public class ClangExecutor : IRuntimeExecutor
 
     private int CompileSourceCode(string code)
     {
+        
         Random rand = new();
-        string filename = rand.Next(0, 1000000000).ToString();
+        string filename = Path.Combine(RuntimeConstants.ClangDirectory, rand.Next(0, 1000000000).ToString());
         sourceFileName = filename + ".c";
         binaryFileName = filename + ".elf";
 
@@ -72,11 +73,14 @@ public class ClangExecutor : IRuntimeExecutor
         return executionExitCode;
     }
 
-    void Cleanup() {
-        if(File.Exists(sourceFileName)) {
+    void Cleanup()
+    {
+        if (File.Exists(sourceFileName))
+        {
             File.Delete(sourceFileName);
         }
-        if(File.Exists(binaryFileName)) {
+        if (File.Exists(binaryFileName))
+        {
             File.Delete(binaryFileName);
         }
     }
@@ -87,6 +91,7 @@ public class ClangExecutor : IRuntimeExecutor
         ICollection<string> output = [];
         Guid guid = Guid.NewGuid();
 
+        output.Add(compilationExitCode.ToString());
         output.Add(compilationSTDOUT);
         output.Add(compilationSTDERR);
 
@@ -95,15 +100,14 @@ public class ClangExecutor : IRuntimeExecutor
             Cleanup();
             return new RuntimeResponse("clang", guid.ToString(), output);
         }
-        
+
         int executionExitCode = ExecuteBinaryFile();
+
+        output.Add(executionExitCode.ToString());
         output.Add(executionSTDOUT);
         output.Add(executionSTDERR);
         Cleanup();
 
         return new RuntimeResponse("clang", guid.ToString(), output);
-    }
-
-    ~ClangExecutor() {
     }
 }
