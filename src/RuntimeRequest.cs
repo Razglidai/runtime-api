@@ -1,1 +1,1 @@
-public record RuntimeRequest(string code, ICollection<string> input);
+public record RuntimeRequest(string code, string uuid, ICollection<string> input);

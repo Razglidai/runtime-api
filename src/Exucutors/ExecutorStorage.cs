@@ -20,16 +20,17 @@ public class ExecutorStorage
             select t;
         foreach (var type in ExecutorsTypes)
         {
-            var attribute = type.GetCustomAttribute<ExecutorsAttribute>();
-            var instance = (IRuntimeExecutor)Activator.CreateInstance(type);
-            Executors[attribute.Type] = instance;
+            var attribute = type.GetCustomAttribute<ExecutorsAttribute>() ?? throw new Exception("attribute is null");
+            var instance = Activator.CreateInstance(type) ?? throw new Exception("instance is null");
+            Executors[attribute.Type] = (IRuntimeExecutor)instance;
         }
     }
 
     public IRuntimeExecutor GetExecutor(string type)
     {
-        return Executors.TryGetValue(type, out var Executors) ? Executors : throw new Exception("no runtime");
+        return Executors.TryGetValue(type, out var executor) ? executor : throw new Exception("no runtime");
     }
+
     public ICollection<string> GetExecutorsList()
     {
         return Executors.Keys;

@@ -1,26 +1,14 @@
 var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
-var services = builder.Services;
 
-services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
-services.AddControllers();
-services.AddTransient<ExecutorStorage>();
+var startup = new Startup(builder.Configuration);
+
+// Добавляем сервисы из Startup
+startup.ConfigureServices(builder.Services);
+
 var app = builder.Build();
 
+// Конфигурируем приложение из Startup
+startup.Configure(app, app.Environment);
 
-using var scope = app.Services.CreateScope();
-
-
-app.UseCors();
-app.MapControllers();
-
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
+// Запуск приложения
 app.Run();

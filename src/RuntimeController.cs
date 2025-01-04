@@ -12,13 +12,13 @@ public class RuntimeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRuntimeList()
+    public Task<IActionResult> GetRuntimeList()
     {
-        return Ok(_ExecutorStorage.GetExecutorsList());
+        return Task.FromResult<IActionResult>(Ok(_ExecutorStorage.GetExecutorsList()));
     }
     [Route("{type}")]
     [HttpPost]
-    public async Task<IActionResult> ExecuteCode(string type, [FromBody]RuntimeRequest request)
+    public Task<IActionResult> ExecuteCode(string type, [FromBody]RuntimeRequest request)
     {
         RuntimeResponse result;
         try
@@ -27,8 +27,8 @@ public class RuntimeController : ControllerBase
         }
         catch (System.Exception e)
         {
-            return BadRequest(e);
+            return Task.FromResult<IActionResult>(BadRequest(e));
         }
-        return Ok(result);
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

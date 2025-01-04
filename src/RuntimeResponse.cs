@@ -1,1 +1,1 @@
-public record RuntimeResponse(string result, string runtime, string memo);
+public record RuntimeResponse(string runtime, string uuid, ICollection<string> output);
