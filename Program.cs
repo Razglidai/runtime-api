@@ -1,14 +1,14 @@
+using Microsoft.AspNetCore.Builder;
+
 var builder = WebApplication.CreateBuilder(args);
 
-var startup = new Startup(builder.Configuration);
+// Конфигурируем сервисы
+Startup.ConfigureServices(builder.Services);
 
-// Добавляем сервисы из Startup
-startup.ConfigureServices(builder.Services);
-
+// Собираем приложение
 var app = builder.Build();
 
-// Конфигурируем приложение из Startup
-startup.Configure(app, app.Environment);
+// Я забыл чё тут должно быть написано
+Startup.Configure(app, app.Environment);
 
-// Запуск приложения
 app.Run();

@@ -4,16 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-public class Startup
+public class Startup()
 {
-    public IConfiguration Configuration { get; }
 
-    public Startup(IConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
-
-    public void ConfigureServices(IServiceCollection services)
+    public static void ConfigureServices(IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -21,7 +15,7 @@ public class Startup
         services.AddTransient<ExecutorStorage>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
         {
@@ -31,7 +25,7 @@ public class Startup
         }
         else
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/error");
             app.UseHsts();
         }
 

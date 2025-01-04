@@ -1,4 +1,6 @@
 using Microsoft.Scripting.Hosting;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -17,7 +19,7 @@ public class ClangExecutor : IRuntimeExecutor
 
     private int CompileSourceCode(string code)
     {
-        Random rand = new Random();
+        Random rand = new();
         string filename = rand.Next(0, 128).ToString();
         sourceFileName = filename + ".c";
         binaryFileName = filename + ".elf";
@@ -41,9 +43,6 @@ public class ClangExecutor : IRuntimeExecutor
             compilationSTDOUT = process.StandardOutput.ReadToEnd();
             compilationSTDERR = process.StandardError.ReadToEnd();
             process.WaitForExit();
-
-            Console.WriteLine("Compile Output: " + compilationSTDOUT); 
-            Console.WriteLine("Compile Error: " + compilationSTDERR);
 
             compilationExitCode = process.ExitCode;
         }
@@ -84,8 +83,8 @@ public class ClangExecutor : IRuntimeExecutor
 
     public RuntimeResponse Execute(RuntimeRequest request)
     {
-        int compilationExitCode = CompileSourceCode(request.code);
-        ICollection<string> output = new List<string>();
+        int compilationExitCode = CompileSourceCode(request.Code);
+        ICollection<string> output = [];
         Guid guid = Guid.NewGuid();
 
         output.Add(compilationSTDOUT);

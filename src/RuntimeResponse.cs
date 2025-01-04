@@ -1,1 +1,3 @@
-public record RuntimeResponse(string runtime, string uuid, ICollection<string> output);
+using System.Collections.Generic;
+
+public record RuntimeResponse(string Runtime, string UUID, ICollection<string> Output);

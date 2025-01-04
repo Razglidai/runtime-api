@@ -1,1 +1,3 @@
-public record RuntimeRequest(string code, string uuid, ICollection<string> input);
+using System.Collections.Generic;
+
+public record RuntimeRequest(string Code, string UUID, ICollection<string> Input);
