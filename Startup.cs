@@ -15,7 +15,7 @@ public class Startup()
         services.AddTransient<ExecutorStorage>();
 
         services.AddTransient<ILangService, CLangService>();
-        services.AddTransient<IRuntimeExecutor, ClangExecutor>();
+        services.AddTransient<IRuntimeExecutor, CExecutor>();
     }
 
     public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)

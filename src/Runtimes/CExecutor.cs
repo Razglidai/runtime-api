@@ -7,11 +7,11 @@ using System.IO;
 using System.Linq;
 
 [ExecutorsAttribute("clang")]
-public class ClangExecutor : IRuntimeExecutor
+public class CExecutor : IRuntimeExecutor
 {
     private readonly ILangService _service;
 
-    public ClangExecutor()
+    public CExecutor()
     {
         _service = new CLangService();
     }
@@ -21,7 +21,18 @@ public class ClangExecutor : IRuntimeExecutor
         Dictionary<string, string> BuildOutput = [];
         Dictionary<string, string> ExecOutput = [];
 
-        int compilationExitCode = _service.Build(request.Code, request.Input["build-args"], BuildOutput);
+        string BuildArgs;
+        if (!request.Input.TryGetValue("compile-args", out BuildArgs))
+        {
+            BuildArgs = "";
+        }
+        string ExecArgs;
+        if (!request.Input.TryGetValue("exec-args", out ExecArgs))
+        {
+            ExecArgs = "";
+        }
+
+        int compilationExitCode = _service.Build(request.Code, BuildArgs, BuildOutput);
 
         if (compilationExitCode != 0)
         {
@@ -29,7 +40,7 @@ public class ClangExecutor : IRuntimeExecutor
             return new RuntimeResponse("clang", request.UUID, BuildOutput);
         }
 
-        int executionExitCode = _service.Execute(request.Input["exec-args"], ExecOutput);
+        int executionExitCode = _service.Execute(ExecArgs, ExecOutput);
         _service.Cleanup();
 
         return new RuntimeResponse("clang", request.UUID, ExecOutput);
