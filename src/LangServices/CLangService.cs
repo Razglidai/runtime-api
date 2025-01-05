@@ -7,7 +7,7 @@ public class CLangService : ILangService
     private string sourceFileName = "";
     private string binaryFileName = "";
 
-    public int Build(string code, List<string> args, Dictionary<string, string> output)
+    public int Build(string Code, string CompileArgs, Dictionary<string, string> Output)
     {
         int exit;
         Random rand = new();
@@ -15,12 +15,12 @@ public class CLangService : ILangService
         sourceFileName = filename + ".c";
         binaryFileName = filename + ".elf";
 
-        File.WriteAllText(sourceFileName, code);
+        File.WriteAllText(sourceFileName, Code);
 
         var compilerProcess = new ProcessStartInfo
         {
             FileName = RuntimeConstants.ClangCompilerPath,
-            Arguments = string.Join(" ", args) + " " + $"{sourceFileName} -o {binaryFileName}",
+            Arguments = CompileArgs + " " + $"{sourceFileName} -o {binaryFileName}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -30,24 +30,23 @@ public class CLangService : ILangService
         using (var process = new Process { StartInfo = compilerProcess })
         {
             process.Start();
-            output["stdout"] = process.StandardOutput.ReadToEnd();
-            output["stderr"] = process.StandardError.ReadToEnd();
+            Output["stdout"] = process.StandardOutput.ReadToEnd();
+            Output["stderr"] = process.StandardError.ReadToEnd();
             process.WaitForExit();
 
             exit = process.ExitCode;
         }
-        output["exit"] = exit.ToString();
+        Output["exit"] = exit.ToString();
         return exit;
     }
 
-    public int Execute(Dictionary<string, string> output)
+    public int Execute(string ExecArgs, Dictionary<string, string> output)
     {
         int exit;
-
         var executionProcess = new ProcessStartInfo
         {
             FileName = RuntimeConstants.ShellPath,
-            Arguments = $"-c ./{binaryFileName}",
+            Arguments = $"-c \"./{binaryFileName} {ExecArgs}\"",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
