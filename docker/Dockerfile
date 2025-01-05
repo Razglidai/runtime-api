@@ -3,6 +3,7 @@ FROM debian:latest
 
 # Устанавливаем основные утилиты
 RUN apt-get update && apt-get upgrade && apt-get install -y \
+    supervisor \
     git \
     python3 \
     gcc \
@@ -26,11 +27,7 @@ WORKDIR /workspace
 RUN git clone https://github.com/Razglidai/runtime-api.git -b build .
 
 # Копируем файл службы в систему
-COPY ./app-daemon.service /etc/systemd/system/
-
-# Включаем и запускаем службу
-RUN systemctl enable app-daemon.service
-RUN systemctl start app-daemon.service
+RUN cp /workspace/docker/runtime-api.conf /etc/supervisor/conf.d/runtime-api.conf
 
 # Устанавливаем начальную команду
-CMD ["systemctl", "default"]
+CMD ["/bin/bash", "/workspace/docker/start.sh"]
