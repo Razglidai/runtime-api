@@ -3,7 +3,7 @@ Description=runtime-api
 
 [Service]
 WorkingDirectory=/workspace
-ExecStart=/usr/bin/dotnet /workspace/YOUR_APP_DLL_NAME.dll
+ExecStart=/usr/bin/dotnet /workspace/build/net8.0/runtime-api.exe
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
