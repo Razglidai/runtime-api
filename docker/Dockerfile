@@ -27,7 +27,6 @@ WORKDIR /workspace
 RUN git clone https://github.com/Razglidai/runtime-api.git -b build .
 
 # Копируем файл службы в систему
-RUN cp /workspace/docker/runtime-api.conf /etc/supervisor/conf.d/runtime-api.conf
-
+RUN cp ./docker/runtime-api.conf /etc/supervisor/conf.d/runtime-api.conf
 # Устанавливаем начальную команду
-CMD ["/bin/bash", "/workspace/docker/start.sh"]
+ENTRYPOINT supervisord -c /etc/supervisor/supervisord.conf
