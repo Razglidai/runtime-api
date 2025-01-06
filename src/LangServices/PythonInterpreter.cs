@@ -11,7 +11,7 @@ public class PythonInterpreter : GenericInterpreter
         sourceFileName = generateFilename() + ".py";
 
         // Запись кода в файл
-        File.WriteAllText(sourceFileName, Encoding.UTF8.GetString(Convert.FromBase64String(Code)));
+        File.WriteAllText(sourceFileName, Code);
 
 
         var executionProcess = new ProcessStartInfo
@@ -27,8 +27,8 @@ public class PythonInterpreter : GenericInterpreter
         using (var process = new Process { StartInfo = executionProcess })
         {
             process.Start();
-            Output["stdout"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardOutput.ReadToEnd()));
-            Output["stderr"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardError.ReadToEnd()));
+            Output["stdout"] = process.StandardOutput.ReadToEnd();
+            Output["stderr"] = process.StandardError.ReadToEnd();
             process.WaitForExit();
             exit = process.ExitCode;
         }

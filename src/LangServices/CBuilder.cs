@@ -15,7 +15,7 @@ public class CBuilder : GenericBuilder
             Directory.CreateDirectory(RuntimeConstants.ClangDirectory);
         }
 
-        File.WriteAllText(sourceFileName, Encoding.UTF8.GetString(Convert.FromBase64String(Code)));
+        File.WriteAllText(sourceFileName, Code);
 
         var compilerProcess = new ProcessStartInfo
         {
@@ -30,8 +30,8 @@ public class CBuilder : GenericBuilder
         using (var process = new Process { StartInfo = compilerProcess })
         {
             process.Start();
-            Output["stdout"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardOutput.ReadToEnd()));
-            Output["stderr"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardError.ReadToEnd()));
+            Output["stdout"] = process.StandardOutput.ReadToEnd();
+            Output["stderr"] = process.StandardError.ReadToEnd();
             process.WaitForExit();
 
             exit = process.ExitCode;
@@ -56,8 +56,8 @@ public class CBuilder : GenericBuilder
         using (var process = new Process { StartInfo = executionProcess })
         {
             process.Start();
-            Output["stdout"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardOutput.ReadToEnd()));
-            Output["stderr"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardError.ReadToEnd()));
+            Output["stdout"] = process.StandardOutput.ReadToEnd();
+            Output["stderr"] = process.StandardError.ReadToEnd();
             process.WaitForExit();
             exit = process.ExitCode;
         }
