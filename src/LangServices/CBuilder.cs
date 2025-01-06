@@ -1,21 +1,21 @@
 using System.Diagnostics;
-using System.Numerics;
-using Microsoft.AspNetCore.Authentication;
+using System.Text;
+using IronPython.Runtime.Operations;
 
-public class CLangService : ILangService
-{    
-    private string sourceFileName = "";
-    private string binaryFileName = "";
-
-    public int Build(string Code, string CompileArgs, Dictionary<string, string> Output)
+public class CBuilder : GenericBuilder
+{
+    public override int Build(string Code, string CompileArgs, Dictionary<string, string> Output)
     {
         int exit;
-        Random rand = new();
-        string filename = Path.Combine(RuntimeConstants.ClangDirectory, rand.Next(0, 1000000000).ToString());
-        sourceFileName = filename + ".c";
-        binaryFileName = filename + ".elf";
+        sourceFileName = generateFilename() + ".c";
+        binaryFileName = generateFilename() + ".elf";
 
-        File.WriteAllText(sourceFileName, Code);
+        if (!Directory.Exists(RuntimeConstants.ClangDirectory))
+        {
+            Directory.CreateDirectory(RuntimeConstants.ClangDirectory);
+        }
+
+        File.WriteAllText(sourceFileName, Encoding.UTF8.GetString(Convert.FromBase64String(Code)));
 
         var compilerProcess = new ProcessStartInfo
         {
@@ -30,8 +30,8 @@ public class CLangService : ILangService
         using (var process = new Process { StartInfo = compilerProcess })
         {
             process.Start();
-            Output["stdout"] = process.StandardOutput.ReadToEnd();
-            Output["stderr"] = process.StandardError.ReadToEnd();
+            Output["stdout"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardOutput.ReadToEnd()));
+            Output["stderr"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardError.ReadToEnd()));
             process.WaitForExit();
 
             exit = process.ExitCode;
@@ -40,7 +40,7 @@ public class CLangService : ILangService
         return exit;
     }
 
-    public int Execute(string ExecArgs, Dictionary<string, string> output)
+    public override int Execute(string ExecArgs, Dictionary<string, string> Output)
     {
         int exit;
         var executionProcess = new ProcessStartInfo
@@ -56,24 +56,12 @@ public class CLangService : ILangService
         using (var process = new Process { StartInfo = executionProcess })
         {
             process.Start();
-            output["stdout"] = process.StandardOutput.ReadToEnd();
-            output["stderr"] = process.StandardError.ReadToEnd();
+            Output["stdout"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardOutput.ReadToEnd()));
+            Output["stderr"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(process.StandardError.ReadToEnd()));
             process.WaitForExit();
             exit = process.ExitCode;
         }
-        output["exit"] = exit.ToString();
+        Output["exit"] = exit.ToString();
         return exit;
-    }
-
-    public void Cleanup()
-    {
-        if (File.Exists(sourceFileName))
-        {
-            File.Delete(sourceFileName);
-        }
-        if (File.Exists(binaryFileName))
-        {
-            File.Delete(binaryFileName);
-        }
     }
 }

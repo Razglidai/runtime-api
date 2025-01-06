@@ -9,11 +9,11 @@ using System.Linq;
 [ExecutorsAttribute("clang")]
 public class CExecutor : IRuntimeExecutor
 {
-    private readonly ILangService _service;
+    private readonly GenericBuilder _service;
 
     public CExecutor()
     {
-        _service = new CLangService();
+        _service = new CBuilder();
     }
 
     public RuntimeResponse Execute(RuntimeRequest request)
@@ -21,16 +21,9 @@ public class CExecutor : IRuntimeExecutor
         Dictionary<string, string> BuildOutput = [];
         Dictionary<string, string> ExecOutput = [];
 
-        string BuildArgs;
-        if (!request.Input.TryGetValue("compile-args", out BuildArgs))
-        {
-            BuildArgs = "";
-        }
-        string ExecArgs;
-        if (!request.Input.TryGetValue("exec-args", out ExecArgs))
-        {
-            ExecArgs = "";
-        }
+        string BuildArgs=request.Input["build-args"] ?? "";
+
+        string ExecArgs=request.Input["exec-args"] ?? "";
 
         int compilationExitCode = _service.Build(request.Code, BuildArgs, BuildOutput);
 

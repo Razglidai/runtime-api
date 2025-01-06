@@ -14,8 +14,11 @@ public class Startup()
         services.AddControllers();
         services.AddTransient<ExecutorStorage>();
 
-        services.AddTransient<ILangService, CLangService>();
-        services.AddTransient<IRuntimeExecutor, CExecutor>();
+        services.AddScoped<GenericInterpreter, PythonInterpreter>();
+        services.AddScoped<GenericBuilder, CBuilder>();
+
+        services.AddScoped<IRuntimeExecutor, PythonExecutor>();
+        services.AddScoped<IRuntimeExecutor, CExecutor>(); 
     }
 
     public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
