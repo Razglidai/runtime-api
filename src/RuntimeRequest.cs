@@ -1,3 +1,3 @@
 using System.Collections.Generic;
 
-public record RuntimeRequest(string Code, string UUID, Dictionary<string, string> Input);
+public record RuntimeRequest(string Code, string UUID, ICollection<string> Input);

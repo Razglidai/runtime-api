@@ -1,5 +1,5 @@
 
-public class GenericBuilder
+public class BuilderService
 {
     public string sourceFileName = "";
     public string binaryFileName = "";
@@ -8,7 +8,6 @@ public class GenericBuilder
     {
         Random rand = new();
         return Path.Combine(RuntimeConstants.ClangDirectory, rand.Next(0, 1000000000).ToString());
-
     }
 
     public virtual int Build(string Code, string compileArgs, Dictionary<string, string> Output)

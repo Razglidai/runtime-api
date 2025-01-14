@@ -1,3 +1,3 @@
 using System.Collections.Generic;
 
-public record RuntimeResponse(string Runtime, string UUID, Dictionary<string, string> Output);
+public record RuntimeDTO(string Stdout, string Stderr, int ExitCode, float RunTime, string RunRAM);

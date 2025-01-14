@@ -1,4 +1,4 @@
 public interface IRuntimeExecutor
 {
-    RuntimeResponse Execute(RuntimeRequest request);
+    ICollection<RuntimeDTO> Execute(RuntimeRequest request);
 }
