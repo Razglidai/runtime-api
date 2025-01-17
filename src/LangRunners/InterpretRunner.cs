@@ -12,7 +12,7 @@ public static class InterpretRunner
     public static List<RuntimeDTO> Run(RunnerData interpreter, RuntimeRequest request)
     {
         List<RuntimeDTO> output = new List<RuntimeDTO>();
-        string filenameBase = Guid.NewGuid().ToString();
+        string filenameBase = Guid.NewGuid().ToString("N");
         string sourceFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + interpreter.sourceExtension);
 
         File.WriteAllText(sourceFilePath, request.code);

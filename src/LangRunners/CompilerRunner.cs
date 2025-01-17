@@ -16,7 +16,7 @@ public static class CompilerRunner
     public static List<RuntimeDTO> Run(RunnerData compiler, RuntimeRequest request)
     {
         List<RuntimeDTO> output = new List<RuntimeDTO>();
-        string filenameBase = Guid.NewGuid().ToString();
+        string filenameBase = Guid.NewGuid().ToString("N");
         string sourceFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + "." + compiler.sourceExtension);
         string binaryFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + ".exe");
 
