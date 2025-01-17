@@ -68,12 +68,13 @@ public static class CompilerRunner
                 TimeSpan processUserTime = TimeSpan.Zero;
                 long processRAM = 0;
 
-                Task monitorTask = Task.Run(() =>
+                Task monitorTask     = Task.Run(() =>
                 {
                     while (!process.HasExited)
                     {
-                        processUserTime = process.UserProcessorTime;
+                        processUserTime = process.TotalProcessorTime;
                         processRAM = process.WorkingSet64;
+                        Thread.Sleep(0); // омега фикс 3000
                     }
                 });
 
@@ -127,8 +128,9 @@ public static class CompilerRunner
                 {
                     while (!process.HasExited)
                     {
-                        processUserTime = process.UserProcessorTime;
+                        processUserTime = process.TotalProcessorTime;
                         processRAM = process.WorkingSet64;
+                        Thread.Sleep(0); // омега фикс 3000
                     }
                 });
 

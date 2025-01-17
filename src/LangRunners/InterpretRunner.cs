@@ -62,8 +62,9 @@ public static class InterpretRunner
                 {
                     while (!process.HasExited)
                     {
-                        processUserTime = process.UserProcessorTime;
+                        processUserTime = process.TotalProcessorTime;
                         processRAM = process.WorkingSet64;
+                        Thread.Sleep(0); // омега фикс 3000
                     }
                 });
 
