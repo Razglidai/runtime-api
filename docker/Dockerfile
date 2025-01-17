@@ -29,4 +29,4 @@ RUN git clone https://github.com/Razglidai/runtime-api.git -b build .
 # Копируем файл службы в систему
 RUN cp ./docker/runtime-api.conf /etc/supervisor/conf.d/runtime-api.conf
 # Устанавливаем начальную команду
-ENTRYPOINT supervisord -c /etc/supervisor/supervisord.conf
+ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/runtime-api.conf"]
