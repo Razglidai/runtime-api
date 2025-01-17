@@ -5,30 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
- public static class InterpretRunner
+public static class InterpretRunner
 {
     private static readonly object randLock = new object();
-
-    private static string GenerateRandomString(uint length = 16)
-    {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        char[] buffer = new char[length];
-
-        Random localRandom;
-        lock (randLock) localRandom = new Random();
-
-        for (int i = 0; i < length; i++)
-        {
-            buffer[i] = chars[localRandom.Next(chars.Length)];
-        }
-
-        return new string(buffer);
-    }
 
     public static List<RuntimeDTO> Run(RunnerData interpreter, RuntimeRequest request)
     {
         List<RuntimeDTO> output = new List<RuntimeDTO>();
-        string filenameBase = GenerateRandomString();
+        string filenameBase = Guid.NewGuid().ToString();
         string sourceFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + interpreter.sourceExtension);
 
         File.WriteAllText(sourceFilePath, request.code);
@@ -75,7 +59,7 @@ using System.Threading;
             stopwatch.Stop();
             exitCode = process.ExitCode;
 
-            runTime = stopwatch.Elapsed.TotalMilliseconds;
+            runTime = process.UserProcessorTime.TotalMilliseconds;
         }
         catch (Exception e)
         {

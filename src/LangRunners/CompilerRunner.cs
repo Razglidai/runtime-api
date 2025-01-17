@@ -12,26 +12,11 @@ public static class CompilerRunner
 {
     private static readonly Random random = new Random();
     private static readonly object randLock = new object();
-    private static string GenerateRandomString(uint length = 16)
-    {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        char[] buffer = new char[length];
-
-        lock (randLock)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                buffer[i] = chars[random.Next(chars.Length)];
-            }
-        }
-
-        return new string(buffer);
-    }
 
     public static List<RuntimeDTO> Run(RunnerData compiler, RuntimeRequest request)
     {
         List<RuntimeDTO> output = new List<RuntimeDTO>();
-        string filenameBase = GenerateRandomString();
+        string filenameBase = Guid.NewGuid().ToString();
         string sourceFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + "." + compiler.sourceExtension);
         string binaryFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + ".exe");
 
