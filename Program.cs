@@ -13,11 +13,9 @@ services.AddScoped<IRuntimeExecutor, CPlusPlusExecutor>();
 services.AddScoped<IRuntimeExecutor, RustExecutor>();
 services.AddScoped<IRuntimeExecutor, DlangExecutor>();
 
-<<<<<<< HEAD
 services.AddScoped<IRuntimeExecutor, PythonExecutor>();
 services.AddScoped<IRuntimeExecutor, LuaExecutor>();
 services.AddScoped<IRuntimeExecutor, PerlExecutor>();
-=======
 
 
 
@@ -27,8 +25,6 @@ services.AddSwaggerGen();
 
 
 
-
->>>>>>> 8c42077d563c3c823d1f305cc2c82f8785c54e33
 // Собираем приложение
 var app = builder.Build();
 
