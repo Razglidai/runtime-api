@@ -35,35 +35,54 @@ public static class InterpretRunner
 
         try
         {
-            Process process = new Process();
-            process.StartInfo.FileName = interpreter.execPath;
-            process.StartInfo.Arguments = interpreter.buildPrompt.Replace("%f", sourceFilePath);
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardInput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            process.Start();
-
-            using (StreamWriter writer = process.StandardInput)
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                writer.WriteLine(stdin);
-                writer.Close();
+                FileName = interpreter.execPath,
+                Arguments = interpreter.buildPrompt.Replace("%f", sourceFilePath),
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (Process process = new Process { StartInfo = startInfo })
+            {
+                process.Start();
+
+                using (StreamWriter writer = process.StandardInput)
+                {
+                    writer.WriteLine(stdin);
+                }
+
+                TimeSpan processUserTime = TimeSpan.Zero;
+                long processRAM = 0;
+
+                Task monitorTask = Task.Run(() =>
+                {
+                    while (!process.HasExited)
+                    {
+                        processUserTime = process.UserProcessorTime;
+                        processRAM = process.WorkingSet64;
+                    }
+                });
+
+                stdout = process.StandardOutput.ReadToEnd();
+                stderr = process.StandardError.ReadToEnd();
+
+
+                process.WaitForExit();
+
+                runTime = processUserTime.TotalMilliseconds;  // В миллисекундах
+                runRAM = processRAM / 1024; // в КБ
+                exitCode = process.ExitCode;
             }
 
-            stdout = process.StandardOutput.ReadToEnd();
-            stderr = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            stopwatch.Stop();
-            exitCode = process.ExitCode;
 
-            runTime = process.UserProcessorTime.TotalMilliseconds;
         }
         catch (Exception e)
         {
-            stderr += "\nОшибка выполнения: " + e.Message;
+            stderr += "\nОшибка выполнения: " + e.StackTrace;
         }
 
         return new RuntimeDTO(stdout, stderr, exitCode, runTime, runRAM);

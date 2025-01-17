@@ -24,7 +24,7 @@ public static class CompilerRunner
 
         foreach (string input in request.input)
         {
-            RuntimeDTO result = Compile(compiler,sourceFilePath, binaryFilePath);
+            RuntimeDTO result = Compile(compiler, sourceFilePath, binaryFilePath);
             if (result.exitCode != 0)
             {
                 output.Add(result);
@@ -46,30 +46,47 @@ public static class CompilerRunner
 
         try
         {
-            Process process = new Process();
-            process.StartInfo.FileName = binaryFilePath;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardInput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            process.Start();
-
-            using (StreamWriter writer = process.StandardInput)
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                writer.WriteLine(stdin);
-                writer.Close();
+                FileName = binaryFilePath,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (Process process = new Process { StartInfo = startInfo })
+            {
+                process.Start();
+
+                using (StreamWriter writer = process.StandardInput)
+                {
+                    writer.WriteLine(stdin);
+                }
+
+                TimeSpan processUserTime = TimeSpan.Zero;
+                long processRAM = 0;
+
+                Task monitorTask = Task.Run(() =>
+                {
+                    while (!process.HasExited)
+                    {
+                        processUserTime = process.UserProcessorTime;
+                        processRAM = process.WorkingSet64;
+                    }
+                });
+
+                stdout = process.StandardOutput.ReadToEnd();
+                stderr = process.StandardError.ReadToEnd();
+
+
+                process.WaitForExit();
+
+                runTime = processUserTime.TotalMilliseconds;  // В миллисекундах
+                runRAM = processRAM / 1024; // в КБ
+                exitCode = process.ExitCode;
             }
-
-            stdout = process.StandardOutput.ReadToEnd();
-            stderr = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            stopwatch.Stop();
-            exitCode = process.ExitCode;
-
-            runTime = stopwatch.Elapsed.TotalMilliseconds;
         }
         catch (Exception e)
         {
@@ -87,26 +104,43 @@ public static class CompilerRunner
 
         try
         {
-            Process process = new Process();
-            process.StartInfo.FileName = compiler.execPath;
-            process.StartInfo.Arguments = compiler.buildPrompt
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = compiler.execPath,
+                Arguments = compiler.buildPrompt
                 .Replace("%s", $"\"{sourceFilePath}\"")
-                .Replace("%b", $"\"{binaryFilePath}\"");
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
+                .Replace("%b", $"\"{binaryFilePath}\""),
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            using (Process process = new Process { StartInfo = startInfo })
+            {
+                process.Start();
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            process.Start();
+                TimeSpan processUserTime = TimeSpan.Zero;
+                long processRAM = 0;
 
-            stdout = process.StandardOutput.ReadToEnd();
-            stderr = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            stopwatch.Stop();
-            exitCode = process.ExitCode;
+                Task monitorTask = Task.Run(() =>
+                {
+                    while (!process.HasExited)
+                    {
+                        processUserTime = process.UserProcessorTime;
+                        processRAM = process.WorkingSet64;
+                    }
+                });
 
-            runTime = stopwatch.Elapsed.TotalMilliseconds;
+                stdout = process.StandardOutput.ReadToEnd();
+                stderr = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                runTime = processUserTime.TotalMilliseconds;  // В миллисекундах
+                runRAM = processRAM / 1024; // в КБ
+                exitCode = process.ExitCode;
+            }
         }
         catch (Exception e)
         {
