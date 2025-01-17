@@ -17,29 +17,20 @@ services.AddScoped<IRuntimeExecutor, PythonExecutor>();
 services.AddScoped<IRuntimeExecutor, LuaExecutor>();
 services.AddScoped<IRuntimeExecutor, PerlExecutor>();
 
-
-
-// Радиоактивная херня
-services.AddSwaggerGen();
-
-
-
+if (builder.Environment.IsDevelopment())
+{
+    // Радиоактивная херня
+    services.AddSwaggerGen();
+}
 
 // Собираем приложение
 var app = builder.Build();
 
-
-
-
-
-
-// Ща сломается
-app.UseSwagger();
-app.UseSwaggerUI();
-
-
-
-
+if (builder.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.MapControllers();
 

@@ -78,8 +78,6 @@ public static class InterpretRunner
                 runRAM = processRAM / 1024; // в КБ
                 exitCode = process.ExitCode;
             }
-
-
         }
         catch (Exception e)
         {

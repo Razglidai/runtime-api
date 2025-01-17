@@ -68,7 +68,7 @@ public static class CompilerRunner
                 TimeSpan processUserTime = TimeSpan.Zero;
                 long processRAM = 0;
 
-                Task monitorTask     = Task.Run(() =>
+                Task monitorTask = Task.Run(() =>
                 {
                     while (!process.HasExited)
                     {
