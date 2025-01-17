@@ -1,0 +1,1 @@
+public record RunnerData(string execPath, string buildPrompt, string sourceExtension);

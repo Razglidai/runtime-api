@@ -28,7 +28,7 @@ public class RuntimeController : ControllerBase
     [HttpPost]
     public Task<IActionResult> ExecuteCode(string type, [FromBody] RuntimeRequest request)
     {
-        RuntimeResponse result;
+        ICollection<RuntimeDTO> result;
         try
         {
             result = _ExecutorStorage.GetExecutor(type).Execute(request);
