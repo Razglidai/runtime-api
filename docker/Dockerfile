@@ -10,9 +10,14 @@ RUN apt-get update && apt-get upgrade && apt-get install -y \
     python3-pip \
     wget \
     curl \
+    gdc \
+    perl \
+    ruby-full \
+    yabasic \
+    rustc \
+    lua5.4 \
     nodejs \
-    npm \
-    systemd
+    npm
 
 # Устанавливаем .NET SDK
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
