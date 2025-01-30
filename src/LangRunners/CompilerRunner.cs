@@ -10,9 +10,6 @@ using System.Threading;
 
 public static class CompilerRunner
 {
-    private static readonly Random random = new Random();
-    private static readonly object randLock = new object();
-
     public static List<RuntimeDTO> Run(RunnerData compiler, RuntimeRequest request)
     {
         List<RuntimeDTO> output = new List<RuntimeDTO>();

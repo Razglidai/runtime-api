@@ -7,8 +7,6 @@ using System.Threading;
 
 public static class InterpretRunner
 {
-    private static readonly object randLock = new object();
-
     public static List<RuntimeDTO> Run(RunnerData interpreter, RuntimeRequest request)
     {
         List<RuntimeDTO> output = new List<RuntimeDTO>();
