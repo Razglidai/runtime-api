@@ -10,6 +10,8 @@ using System.Threading;
 
 public static class CompilerRunner
 {
+    private static object syncLock = new object();
+
     public static List<RuntimeDTO> Run(RunnerData compiler, RuntimeRequest request)
     {
         List<RuntimeDTO> output = new List<RuntimeDTO>();
@@ -38,7 +40,8 @@ public static class CompilerRunner
     private static RuntimeDTO Execute(string binaryFilePath, string stdin)
     {
         string stdout = "", stderr = "";
-        double runRAM = 0, runTime = 0;
+        long runRAM = 0;
+        double runTime = 0;
         int exitCode = -1;
 
         try
@@ -67,11 +70,21 @@ public static class CompilerRunner
 
                 Task monitorTask = Task.Run(() =>
                 {
-                    while (!process.HasExited)
+                    try
                     {
-                        processUserTime = process.TotalProcessorTime;
-                        processRAM = process.WorkingSet64;
-                        Thread.Sleep(0); // омега фикс 3000
+                        while (!process.HasExited)
+                        {
+                            lock (syncLock)
+                            {
+                                runTime = (long)process.UserProcessorTime.TotalMilliseconds;
+                                runRAM = process.WorkingSet64 / 1024;
+                            }
+                            Thread.Sleep(5);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка мониторинга: {ex.Message}");
                     }
                 });
 
@@ -81,7 +94,7 @@ public static class CompilerRunner
 
                 process.WaitForExit();
 
-                runTime = processUserTime.TotalMilliseconds;  // В миллисекундах
+                runTime = process.TotalProcessorTime.TotalMilliseconds;  // В миллисекундах
                 runRAM = processRAM / 1024; // в КБ
                 exitCode = process.ExitCode;
             }
@@ -91,13 +104,14 @@ public static class CompilerRunner
             stderr += "\nОшибка выполнения: " + e.Message;
         }
 
-        return new RuntimeDTO(stdout, stderr, exitCode, runTime, runRAM);
+        return new RuntimeDTO(stdout, stderr, exitCode, (long)runTime, runRAM);
     }
 
     private static RuntimeDTO Compile(RunnerData compiler, string sourceFilePath, string binaryFilePath)
     {
         string stdout = "", stderr = "";
-        double runRAM = 0, runTime = 0;
+        long runRAM = 0;
+        long runTime = 0;
         int exitCode = -1;
 
         try
@@ -123,20 +137,30 @@ public static class CompilerRunner
 
                 Task monitorTask = Task.Run(() =>
                 {
-                    while (!process.HasExited)
+                    try
                     {
-                        processUserTime = process.TotalProcessorTime;
-                        processRAM = process.WorkingSet64;
-                        Thread.Sleep(0); // омега фикс 3000
+                        while (!process.HasExited)
+                        {
+                            lock (syncLock)
+                            {
+                                runTime = (long)process.UserProcessorTime.TotalMilliseconds;
+                                runRAM = process.WorkingSet64 / 1024;
+                            }
+                            Thread.Sleep(5);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка мониторинга: {ex.Message}");
                     }
                 });
 
                 stdout = process.StandardOutput.ReadToEnd();
                 stderr = process.StandardError.ReadToEnd();
 
-                process.WaitForExit();
+                process.WaitForExit(1000);
 
-                runTime = processUserTime.TotalMilliseconds;  // В миллисекундах
+                runTime = (long)processUserTime.TotalMilliseconds;  // В миллисекундах
                 runRAM = processRAM / 1024; // в КБ
                 exitCode = process.ExitCode;
             }

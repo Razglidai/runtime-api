@@ -20,20 +20,20 @@ services.AddScoped<IRuntimeExecutor, PerlExecutor>();
 services.AddScoped<IRuntimeExecutor, PythonExecutor>();
 services.AddScoped<IRuntimeExecutor, RubyExecutor>();
 
-if (builder.Environment.IsDevelopment())
-{
+//if (builder.Environment.IsDevelopment())
+//{
     // Радиоактивная херня
     services.AddSwaggerGen();
-}
+//}
 
 // Собираем приложение
 var app = builder.Build();
 
-if (builder.Environment.IsDevelopment())
-{
+//if (builder.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.MapControllers();
 
