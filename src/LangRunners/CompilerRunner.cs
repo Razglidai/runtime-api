@@ -8,28 +8,41 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
+// Код раннера компилируемых языков
+// Где бог, когда он так нужен?
 public static class CompilerRunner
 {
+    // Нужная часть с таском мониторинга памяти и ресурсов
     private static object syncLock = new object();
 
+    // А чё она статическая?
     public static List<RuntimeDTO> Run(RunnerData compiler, RuntimeRequest request)
     {
+        // Выводные данные
         List<RuntimeDTO> output = new List<RuntimeDTO>();
+
+        // Собираем новый файл в который будет навалено кодом
         string filenameBase = Guid.NewGuid().ToString("N");
         string sourceFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + "." + compiler.sourceExtension);
         string binaryFilePath = Path.Combine(LangRunnerConstants.POOL_DIR, filenameBase + ".exe");
 
         File.WriteAllText(sourceFilePath, request.code);
 
+        // Так как у нас в реквесте массив вводов,
+        // делаем цикл с ними и тестим код
         foreach (string input in request.input)
         {
+            // компиляция
             RuntimeDTO result = Compile(compiler, sourceFilePath, binaryFilePath);
+            // если не скомпилилось
             if (result.exitCode != 0)
             {
                 output.Add(result);
                 continue;
             }
+            // прогон
             result = Execute(binaryFilePath, input);
+            // финал
             output.Add(result);
         }
 
@@ -39,11 +52,13 @@ public static class CompilerRunner
 
     private static RuntimeDTO Execute(string binaryFilePath, string stdin)
     {
+        // Получаемые значения с прогона бинарника
         string stdout = "", stderr = "";
         long runRAM = 0;
         double runTime = 0;
         int exitCode = -1;
 
+        // Богу стыдно за это
         try
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
@@ -65,8 +80,10 @@ public static class CompilerRunner
                     writer.WriteLine(stdin);
                 }
 
-                TimeSpan processUserTime = TimeSpan.Zero;
-                long processRAM = 0;
+                // таск монитора, цепляется ВО ВРЕМЯ РАБОТЫ 
+                // К ЗАПУЩЕННОМУ ПРОЦЕССУ
+                // И РАБОТАЕТ ПОКА ТОТ ЗАПУЩЕН
+                // ИНАЧЕ EXCEPTION
 
                 Task monitorTask = Task.Run(() =>
                 {
@@ -76,26 +93,38 @@ public static class CompilerRunner
                         {
                             lock (syncLock)
                             {
-                                runTime = (long)process.UserProcessorTime.TotalMilliseconds;
-                                runRAM = process.WorkingSet64 / 1024;
+                                runTime = process.TotalProcessorTime.TotalMilliseconds;
+                                runRAM = process.WorkingSet64 / 1024; // ловкий перевод в КБ (красное и белое)
                             }
+                            /*
+                            Одному богу на этой грешной земле известны
+                            замыслы разработчиков того проклятого
+                            Process, считающего время работы процесса
+                            только во время выполнения и только
+                            каждые 10 миллисекунд
+                            Это также распространяется на stdout и stderr
+
+                            короче код внизу ничего полезного не делает, но
+                            предотвращает затирание данных при закрывшемся процессе
+                            */
                             Thread.Sleep(5);
                         }
                     }
                     catch (Exception ex)
                     {
+                        // просто отладка
                         Console.WriteLine($"Ошибка мониторинга: {ex.Message}");
                     }
                 });
 
+                // граббим выводы
+
                 stdout = process.StandardOutput.ReadToEnd();
                 stderr = process.StandardError.ReadToEnd();
 
-
+                // ждём конца процесса
                 process.WaitForExit();
 
-                runTime = process.TotalProcessorTime.TotalMilliseconds;  // В миллисекундах
-                runRAM = processRAM / 1024; // в КБ
                 exitCode = process.ExitCode;
             }
         }
@@ -104,14 +133,14 @@ public static class CompilerRunner
             stderr += "\nОшибка выполнения: " + e.Message;
         }
 
-        return new RuntimeDTO(stdout, stderr, exitCode, (long)runTime, runRAM);
+        return new RuntimeDTO(stdout, stderr, exitCode, runTime, runRAM);
     }
 
     private static RuntimeDTO Compile(RunnerData compiler, string sourceFilePath, string binaryFilePath)
     {
         string stdout = "", stderr = "";
         long runRAM = 0;
-        long runTime = 0;
+        double runTime = 0;
         int exitCode = -1;
 
         try
@@ -132,9 +161,6 @@ public static class CompilerRunner
             {
                 process.Start();
 
-                TimeSpan processUserTime = TimeSpan.Zero;
-                long processRAM = 0;
-
                 Task monitorTask = Task.Run(() =>
                 {
                     try
@@ -143,10 +169,10 @@ public static class CompilerRunner
                         {
                             lock (syncLock)
                             {
-                                runTime = (long)process.UserProcessorTime.TotalMilliseconds;
+                                runTime = process.TotalProcessorTime.TotalMilliseconds;
                                 runRAM = process.WorkingSet64 / 1024;
                             }
-                            Thread.Sleep(5);
+                            Thread.Sleep(1);
                         }
                     }
                     catch (Exception ex)
@@ -160,8 +186,6 @@ public static class CompilerRunner
 
                 process.WaitForExit(1000);
 
-                runTime = (long)processUserTime.TotalMilliseconds;  // В миллисекундах
-                runRAM = processRAM / 1024; // в КБ
                 exitCode = process.ExitCode;
             }
         }

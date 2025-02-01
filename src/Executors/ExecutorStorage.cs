@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+// Вообще без понятия чё это, но это работает
+// UPD: Разобрался, ну и жесть
 public class ExecutorStorage
 {
     private readonly Dictionary<string, IRuntimeExecutor> Executors = new();
